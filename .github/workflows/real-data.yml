@@ -3,6 +3,13 @@ name: Real data run
 # Unduh data asli langsung dari sumbernya di runner GitHub (tidak bergantung pada izin host sesi),
 # jalankan pipeline, cek reprodusibilitas, lalu commit hasil bila diminta.
 on:
+  # Setiap PR yang mengubah pipeline diuji ulang dengan data asli yang diunduh dari sumbernya.
+  pull_request:
+    paths:
+      - "src/**"
+      - "tools/**"
+      - "pyproject.toml"
+      - ".github/workflows/real-data.yml"
   workflow_dispatch:
     inputs:
       commit_results:
@@ -31,7 +38,8 @@ jobs:
         run: geo-atlas run
       - name: Bandingkan dengan versi yang di-commit (K10)
         id: cmp
-        continue-on-error: true
+        # Di PR perbedaan = gagal; lewat dispatch boleh beda lalu di-commit bila diminta.
+        continue-on-error: ${{ github.event_name == 'workflow_dispatch' }}
         run: python tools/check_reproducible.py compare
       - name: Pipeline run 2 harus identik dengan run 1
         run: |
@@ -46,7 +54,7 @@ jobs:
             results/
             data/raw/manifest.json
       - name: Commit hasil (opsional)
-        if: inputs.commit_results && steps.cmp.outcome == 'failure'
+        if: github.event_name == 'workflow_dispatch' && inputs.commit_results && steps.cmp.outcome == 'failure'
         run: |
           git config user.name "github-actions[bot]"
           git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
