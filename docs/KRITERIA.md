@@ -1,7 +1,8 @@
 # Status kriteria penerimaan
 
 Kriteria ditulis 2026-10-29 **sebelum coding** (`/mnt/project-files/geo-industrial-atlas/kriteria-penerimaan.md`).
-Status di bawah dicek 2026-10-29 pada data asli (Overture 2026-10-21.0, geoBoundaries dengan hash terkunci).
+Status di bawah dicek 2026-10-29 pada data asli (Overture 2026-10-21.0, geoBoundaries dengan hash terkunci);
+K10 bagian CI ditambahkan 2026-10-30.
 
 | # | Kriteria | Status | Bukti |
 |---|---|---|---|
@@ -14,10 +15,10 @@ Status di bawah dicek 2026-10-29 pada data asli (Overture 2026-10-21.0, geoBound
 | K7 | Coverage layanan dan data, kesesuaian antar sumber | **Lulus** | Skenario dasar 97,18% (9.127/9.392) ≤ 10 km dari RS; kab/kota kosong per lapisan; Spearman industri 0,51 (luas OSM) / 0,59 (jumlah), RS 0,66 |
 | K8 | Grid sensitivitas lengkap; label "kokoh" jujur | **Lulus** | 216 kombinasi; Kendall tau median 0,49 ("terjauh dari RS") vs 0,91 (kepadatan); 7 kota kokoh di 10 besar kepadatan; tidak ada kab/kota kokoh di 10 besar "terjauh" (Kutai Kartanegara 78%) |
 | K9 | Browser = Python untuk semua skenario | **Lulus** | `web/tests/parity.test.ts`: 216 kombinasi, n, n_cov, coverage, 10 besar identik |
-| K10 | Rerun dari data terkunci identik byte-per-byte | **Lulus lokal; CI belum** | Tiga kali `geo-atlas run` di sesi: hash 6 file publikasi sama. Unduh ulang + bandingkan di GitHub (`real-data.yml`) belum pernah jalan karena repo belum ada |
+| K10 | Rerun dari data terkunci identik byte-per-byte | **Lulus** | Lokal: tiga kali `geo-atlas run`, hash 6 file publikasi sama. GitHub: `real-data.yml` run 41083221269 (2026-10-30) mengunduh ulang geoBoundaries + Overture di runner, hasil `identik` dengan yang di-commit, run kedua identik, pytest 34 lulus |
 | K11 | Statis, file < 25 MiB, tanpa tile eksternal, atribusi tampil | **Lulus** | `scripts/check-build.mjs`: 20 file, terbesar 2,6 MiB, tidak ada URL tile, atribusi CC BY 3.0 IGO / CDLA-P-2.0 / ODbL ada di HTML |
 | K12 | Tidak ada klaim jumlah resmi atau sebab-akibat | **Lulus** | `tests/test_published_results.py::test_k12…` memindai teks pernyataan dan sumber web |
-| K13 | UI beda, dicek 1440/390 terang/gelap, axe 0 | **Lulus (lokal)** | Screenshot 5 bab × 4 tampilan; axe 0 pelanggaran di 20 kombinasi. Situs langsung belum ada |
+| K13 | UI beda, dicek 1440/390 terang/gelap, axe 0 | **Lulus (lokal + CI)** | Screenshot 5 bab × 4 tampilan; axe 0 pelanggaran di 20 kombinasi, juga di job CI `web`. Situs langsung belum ada |
 
 ## Penyimpangan dari Master PDF dan dari rencana
 
@@ -31,5 +32,5 @@ Status di bawah dicek 2026-10-29 pada data asli (Overture 2026-10-21.0, geoBound
 
 ## Yang belum bisa diklaim
 
-- Situs langsung dan CI di GitHub: belum ada repo `muhshandy-dev/geo-industrial-atlas`.
-- Unduh ulang dari runner GitHub (K10 bagian CI).
+- Situs langsung di Cloudflare Pages: belum dibuat, dan sesi tidak bisa membuka `*.pages.dev`.
+  Shandy perlu mengecek sendiri setelah deploy.
