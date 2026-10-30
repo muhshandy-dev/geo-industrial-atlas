@@ -1,0 +1,72 @@
+---
+import "../styles/global.css";
+import Atlas from "../components/Atlas.tsx";
+import results from "../../public/data/results.json";
+
+const base = results.base;
+const desc = `Atlas geospasial titik industri dan jaraknya ke rumah sakit di 514 kabupaten/kota Indonesia, dengan uji spatial join dua mesin, coverage data, dan ${results.sensitivity.n_scenarios} skenario sensitivitas asumsi.`;
+// kirim hanya bagian yang dipakai UI
+const slim = {
+  provenance: { base_scenario: results.provenance.base_scenario, overture_release: results.provenance.overture_release },
+  coverage: results.coverage,
+  checks: results.checks,
+  statements: results.statements,
+  influence: results.influence,
+  base,
+  sensitivity: {
+    n_scenarios: results.sensitivity.n_scenarios,
+    top10_underserved_frequency: results.sensitivity.top10_underserved_frequency,
+    rows: results.sensitivity.rows.map((r) => ({ key: r.key, radius: r.radius, n: r.n, n_cov: r.n_cov, share_cov: r.share_cov, tau_underserved: r.tau_underserved, tau_density: r.tau_density })),
+  },
+};
+---
+<!doctype html>
+<html lang="id">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>Geo-Industrial Insights Atlas</title>
+    <meta name="description" content={desc} />
+    <link rel="icon" href="/favicon.svg" type="image/svg+xml" />
+    <meta name="theme-color" content="#f5efe0" media="(prefers-color-scheme: light)" />
+    <meta name="theme-color" content="#101a19" media="(prefers-color-scheme: dark)" />
+    <script is:inline>
+      try { const t = localStorage.getItem("atlas-theme"); if (t === "light" || t === "dark") document.documentElement.dataset.theme = t; } catch (e) {}
+    </script>
+  </head>
+  <body>
+    <header class="topbar">
+      <a class="brand" href="/">
+        <svg width="32" height="32" viewBox="0 0 32 32" aria-hidden="true"><rect width="32" height="32" rx="8" fill="var(--teal)"/><path d="M6 21c3-5 6-7 10-7s7 2 10-1" fill="none" stroke="var(--bg)" stroke-width="2" stroke-linecap="round"/><path d="M6 15c3-4 6-6 10-6s6 1 9-1" fill="none" stroke="var(--bg)" stroke-opacity=".55" stroke-width="1.6" stroke-linecap="round"/><circle cx="21" cy="21" r="3" fill="var(--bg)"/></svg>
+        <span style="min-width:0">
+          <span class="brand-name">Geo-Industrial Insights Atlas</span>
+          <span class="brand-sub" style="display:block">Industri, rumah sakit, dan pemadam di 514 kab/kota · data terbuka, diuji</span>
+        </span>
+      </a>
+      <span class="spacer"></span>
+      <button class="icon-btn" id="theme-btn" type="button" aria-label="Ganti tema terang atau gelap">
+        <svg width="16" height="16" viewBox="0 0 24 24" aria-hidden="true"><path fill="currentColor" d="M12 3a9 9 0 1 0 9 9 7 7 0 0 1-9-9z"/></svg>
+        <span id="theme-label">Tema</span>
+      </button>
+    </header>
+    <main>
+      <h1 class="sr-only">Geo-Industrial Insights Atlas: titik industri tercatat dan jaraknya ke fasilitas tanggap darurat</h1>
+      <Atlas client:load results={slim} />
+    </main>
+    <script is:inline>
+      (function () {
+        const btn = document.getElementById("theme-btn");
+        const lbl = document.getElementById("theme-label");
+        const cur = () => document.documentElement.dataset.theme || (matchMedia("(prefers-color-scheme: dark)").matches ? "dark" : "light");
+        const sync = () => { lbl.textContent = cur() === "dark" ? "Gelap" : "Terang"; };
+        sync();
+        btn.addEventListener("click", () => {
+          const next = cur() === "dark" ? "light" : "dark";
+          document.documentElement.dataset.theme = next;
+          try { localStorage.setItem("atlas-theme", next); } catch (e) {}
+          sync();
+        });
+      })();
+    </script>
+  </body>
+</html>
